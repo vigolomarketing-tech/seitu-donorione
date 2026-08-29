@@ -1,0 +1,12 @@
+<!--
+  Placeholder para compartir en redes (WhatsApp, Facebook, Twitter).
+  IMPORTANTE: reemplazar por una foto real de 1200x630 en formato JPG o PNG antes de publicar,
+  ya que muchas plataformas no muestran bien imágenes SVG en las vistas previas de los links.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#29ABE2"/>
+  <rect width="1200" height="630" fill="#2B2E83" opacity="0.08"/>
+  <text x="600" y="280" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="96" fill="#ffffff">Sei Tu</text>
+  <text x="600" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-weight="600" font-size="34" fill="#ffffff">Heladería y Cafetería — Don Orione</text>
+  <text x="600" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" fill="#ffffff">Av. Eva Perón 2680, Claypole</text>
+</svg>
