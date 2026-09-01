@@ -2,29 +2,56 @@
 <html lang="es-AR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
 
   <!--
-    Estos valores del <head> (title, description, Open Graph, JSON-LD) están escritos acá
-    a mano porque los buscadores y las redes sociales necesitan leerlos sin ejecutar JavaScript.
-    Si cambiás datos del negocio en js/config.js (dirección, teléfono, horarios, sucursal),
-    actualizá también estos mismos datos acá para que no queden desincronizados.
+    title / meta description / Open Graph / Twitter Card / JSON-LD quedan escritos
+    a mano acá abajo porque los buscadores y, sobre todo, los bots de vista previa
+    de WhatsApp/Facebook/Instagram/Twitter NO ejecutan JavaScript: si dependieran
+    de config.js no se verían. Si cambiás dirección, teléfono, horarios o sucursal
+    en js/config.js, actualizá también estos mismos datos acá para que no queden
+    desincronizados (ver el comentario al principio de js/config.js).
+
+    El <link rel="canonical"> y el <meta name="robots"> SÍ se arman en vivo a partir
+    de CONFIG.site (ver el script justo debajo de la carga de config.js), porque los
+    buscadores sí interpretan JavaScript y así hay un único interruptor
+    (CONFIG.site.indexable) para pasar de "demo, no indexar" a "sitio real".
   -->
 
   <title>Heladería en Don Orione | Sei Tu — Delivery de helado en Claypole</title>
   <meta
     name="description"
-    content="Sei Tu Don Orione: heladería y cafetería en Av. Eva Perón 2680, Don Orione, Claypole. Pedí tu helado con delivery de 19 a 00hs o retiralo en el local. Abierto todos los días de 11 a 22hs."
+    content="Sei Tu Don Orione: heladería y cafetería en Av. Eva Perón 2680, Don Orione, Claypole. Pedí tu helado con delivery de 19:00 a 22:00 hs o retiralo en el local. Abierto todos los días de 11 a 22hs."
   />
-  <link rel="canonical" href="https://www.seitudonorione.com.ar/" />
+
+  <!-- config.js NO va con "defer": tiene que estar listo antes del script siguiente,
+       que arma el robots/canonical del <head> a partir de CONFIG.site. -->
+  <script src="./js/config.js"></script>
+  <script>
+    (function () {
+      var urlActual = CONFIG.site.indexable ? CONFIG.site.url : CONFIG.site.urlDemo;
+
+      var meta = document.createElement("meta");
+      meta.setAttribute("name", "robots");
+      meta.setAttribute("content", CONFIG.site.indexable ? "index, follow" : "noindex, nofollow");
+      document.head.appendChild(meta);
+
+      var canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      canonical.setAttribute("href", urlActual);
+      document.head.appendChild(canonical);
+    })();
+  </script>
+
   <meta name="theme-color" content="#29ABE2" />
-  <meta name="robots" content="index, follow" />
 
   <!-- Favicons -->
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-  <link rel="apple-touch-icon" href="assets/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="./assets/favicon.svg" />
 
-  <!-- Open Graph -->
+  <!-- Open Graph: URLs absolutas apuntando a la demo de GitHub Pages (que existe de
+       verdad hoy). Cuando el dominio real esté comprado y CONFIG.site.indexable pase
+       a true, reemplazar "urlDemo" por "url" acá abajo también. -->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="es_AR" />
   <meta property="og:site_name" content="Sei Tu Don Orione" />
@@ -33,10 +60,11 @@
     property="og:description"
     content="Heladería y cafetería en Av. Eva Perón 2680, Don Orione, Claypole. Pedí online y recibilo por delivery o retiralo en el local."
   />
-  <meta property="og:image" content="https://www.seitudonorione.com.ar/assets/og-image.svg" />
+  <meta property="og:image" content="https://vigolomarketing-tech.github.io/seitu-donorione/assets/og-image.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:url" content="https://www.seitudonorione.com.ar/" />
+  <meta property="og:url" content="https://vigolomarketing-tech.github.io/seitu-donorione/" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -45,10 +73,10 @@
     name="twitter:description"
     content="Heladería y cafetería en Av. Eva Perón 2680, Don Orione, Claypole. Pedí online y recibilo por delivery o retiralo en el local."
   />
-  <meta name="twitter:image" content="https://www.seitudonorione.com.ar/assets/og-image.svg" />
+  <meta name="twitter:image" content="https://vigolomarketing-tech.github.io/seitu-donorione/assets/og-image.jpg" />
 
   <!-- CSS: no hay fuentes externas que bloqueen el render (usamos fuentes del sistema) -->
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="./css/styles.css" />
 
   <!-- JSON-LD: negocio (IceCreamShop, subtipo de FoodEstablishment/LocalBusiness) -->
   <script type="application/ld+json">
@@ -121,11 +149,11 @@
   }
   </script>
 
-  <!-- Scripts con defer: no bloquean el render y se ejecutan en orden antes de DOMContentLoaded -->
-  <script src="js/config.js" defer></script>
-  <script src="js/cart.js" defer></script>
-  <script src="js/whatsapp.js" defer></script>
-  <script src="js/app.js" defer></script>
+  <!-- cart.js, whatsapp.js y app.js van con defer: no bloquean el render y se
+       ejecutan en orden, después de config.js, antes de DOMContentLoaded. -->
+  <script src="./js/cart.js" defer></script>
+  <script src="./js/whatsapp.js" defer></script>
+  <script src="./js/app.js" defer></script>
 </head>
 <body>
   <!-- Anuncia cambios de estado a lectores de pantalla (ej. "producto agregado") -->
@@ -135,21 +163,42 @@
   <div id="banner-horario" class="banner-horario" role="status"></div>
 
   <header class="site-header">
-    <img id="logo-img" class="logo-img" src="" alt="" width="44" height="44" />
+    <img
+      id="logo-img"
+      class="logo-img"
+      src="./assets/logo.svg"
+      alt="Logo de Sei Tu Heladería - Cafetería en Claypole"
+      width="44"
+      height="44"
+    />
     <div class="site-header-info">
       <p id="hero-nombre-header" class="visualmente-oculto">Sei Tu Don Orione</p>
     </div>
   </header>
 
   <section class="hero">
-    <img id="hero-img" class="hero-img" src="" alt="" width="280" height="210" fetchpriority="high" />
+    <img
+      id="hero-img"
+      class="hero-img"
+      src="./assets/hero.svg"
+      alt="Helados artesanales de Sei Tu en Don Orione, Claypole"
+      width="280"
+      height="210"
+      fetchpriority="high"
+    />
     <div class="hero-card">
-      <h1 id="hero-nombre"></h1>
-      <p id="hero-direccion"></p>
-      <p id="hero-horario"></p>
+      <h1 id="hero-nombre">Heladería y cafetería en Don Orione, Claypole — Sei Tu Don Orione</h1>
+      <p id="hero-direccion">Av. Eva Perón 2680, Don Orione</p>
+      <p id="hero-horario">Lunes a domingo de 11:00 a 22:00 hs</p>
     </div>
     <button id="btn-pedir-ahora" class="btn btn-primario btn-pedir-ahora" type="button">Pedir ahora</button>
   </section>
+
+  <p class="intro-seo">
+    Sei Tu es la heladería y cafetería de referencia en Don Orione, Claypole, partido de Almirante Brown.
+    Además de atender en el local de Av. Eva Perón 2680, hacemos delivery de helado en Don Orione, Claypole
+    y zonas cercanas, todos los días de 19:00 a 22:00 hs.
+  </p>
 
   <nav id="categorias-nav" class="categorias-nav" aria-label="Categorías de productos"></nav>
 
@@ -159,30 +208,142 @@
     <section class="sabores-section" id="sabores" aria-label="Sabores de helado">
       <h2>Nuestros sabores de helado</h2>
       <div id="sabores-filtros" class="sabores-filtros"></div>
-      <div id="sabores-lista" class="sabores-lista"></div>
+      <div id="sabores-lista" class="sabores-lista">
+        <!--
+          Lista completa de sabores agrupada por categoría, escrita acá para que exista
+          sin depender de JavaScript. js/app.js vuelve a generar este mismo contenido a
+          partir de CONFIG.sabores (que es la fuente real de los datos) apenas carga, y
+          lo actualiza cuando se usan los filtros de arriba.
+        -->
+        <div class="sabores-categoria-grupo" data-categoria="cremas">
+          <h3 class="sabores-categoria-titulo">Cremas</h3>
+          <ul class="sabores-lista-grupo">
+            <li class="sabor-chip"><span>Pistacho</span></li>
+            <li class="sabor-chip"><span>Americana</span></li>
+            <li class="sabor-chip"><span>Vainilla</span></li>
+            <li class="sabor-chip"><span>Crema del cielo</span></li>
+            <li class="sabor-chip"><span>Granizado</span></li>
+            <li class="sabor-chip"><span>Menta granizada</span></li>
+            <li class="sabor-chip"><span>Crema flan</span></li>
+            <li class="sabor-chip"><span>Sambayón</span></li>
+            <li class="sabor-chip"><span>Tramontana</span></li>
+            <li class="sabor-chip"><span>Tiramisú</span></li>
+            <li class="sabor-chip"><span>Mantecol</span></li>
+            <li class="sabor-chip"><span>Mascarpone</span></li>
+            <li class="sabor-chip"><span>Crema Oreo</span></li>
+            <li class="sabor-chip"><span>Multisabor</span></li>
+            <li class="sabor-chip"><span>Frutilla a la crema</span></li>
+            <li class="sabor-chip"><span>Banana</span></li>
+            <li class="sabor-chip"><span>Banana Split</span></li>
+            <li class="sabor-chip"><span>Bananita Dolca</span></li>
+            <li class="sabor-chip"><span>Cereza a la crema</span></li>
+            <li class="sabor-chip"><span>Frutos patagónicos</span></li>
+          </ul>
+        </div>
+        <div class="sabores-categoria-grupo" data-categoria="chocolates">
+          <h3 class="sabores-categoria-titulo">Chocolates</h3>
+          <ul class="sabores-lista-grupo">
+            <li class="sabor-chip"><span>Chocolate</span></li>
+            <li class="sabor-chip"><span>Chocolate blanco</span></li>
+            <li class="sabor-chip"><span>Chocolate con almendras</span></li>
+            <li class="sabor-chip"><span>Chocolate marroc</span></li>
+            <li class="sabor-chip"><span>Super choco Sei Tu</span></li>
+            <li class="sabor-chip sabor-chip--especial"><span>Chocolate Dubai</span><span class="badge-especial">Especial</span></li>
+            <li class="sabor-chip sabor-chip--especial"><span>Chocolate Shot</span><span class="badge-especial">Especial</span></li>
+            <li class="sabor-chip sabor-chip--especial"><span>Chocolate Mousse Milka</span><span class="badge-especial">Especial</span></li>
+          </ul>
+        </div>
+        <div class="sabores-categoria-grupo" data-categoria="dulce-de-leche">
+          <h3 class="sabores-categoria-titulo">Dulce de leche</h3>
+          <ul class="sabores-lista-grupo">
+            <li class="sabor-chip"><span>Dulce de leche</span></li>
+            <li class="sabor-chip"><span>Dulce de leche granizado</span></li>
+            <li class="sabor-chip"><span>Dulce de leche Sei Tu</span></li>
+            <li class="sabor-chip"><span>Dulce de leche con nuez</span></li>
+            <li class="sabor-chip"><span>Super dulce de leche</span></li>
+            <li class="sabor-chip sabor-chip--especial"><span>Dulce de leche Oreo</span><span class="badge-especial">Especial</span></li>
+          </ul>
+        </div>
+        <div class="sabores-categoria-grupo" data-categoria="al-agua">
+          <h3 class="sabores-categoria-titulo">Al agua</h3>
+          <ul class="sabores-lista-grupo">
+            <li class="sabor-chip"><span>Limón</span></li>
+            <li class="sabor-chip"><span>Ananá</span></li>
+            <li class="sabor-chip"><span>Frutilla</span></li>
+            <li class="sabor-chip"><span>Durazno</span></li>
+            <li class="sabor-chip"><span>Limón a la reina</span></li>
+            <li class="sabor-chip sabor-chip--especial"><span>Frutilla Cadbury</span><span class="badge-especial">Especial</span></li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <div class="contenido-seo">
       <section aria-labelledby="seo-como-pedir-titulo">
-        <h2 id="seo-como-pedir-titulo"></h2>
-        <p id="seo-como-pedir-texto"></p>
+        <h2 id="seo-como-pedir-titulo">Cómo pedir tu helado en Don Orione</h2>
+        <div id="seo-como-pedir-texto">
+          <p>Pedir helado en Sei Tu, la heladería de Don Orione, es simple: elegís tus cucuruchos o potes del catálogo, armás la combinación de sabores que más te guste, completás tus datos y confirmás el pedido por WhatsApp, ya redactado.</p>
+          <p>Podés retirarlo vos mismo en el local de Av. Eva Perón 2680, Don Orione, Claypole, o pedirlo con delivery de helado en Don Orione todos los días de 19:00 a 22:00 hs. El local está abierto todos los días de 11:00 a 22:00 hs.</p>
+          <p>En Sei Tu elaboramos helado artesanal con más de 30 sabores, así que podés elegir con calma antes de pedir online: cremas clásicas, chocolates, dulce de leche y helados al agua.</p>
+        </div>
+
+        <div id="tabla-precios-wrapper" class="oculto-si-hay-js">
+          <h3>Precios principales</h3>
+          <table class="tabla-precios">
+            <caption class="visualmente-oculto">Precios principales de Sei Tu Don Orione</caption>
+            <thead>
+              <tr><th scope="col">Producto</th><th scope="col">Precio</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Cucurucho 1 bocha</th><td>$3.000</td></tr>
+              <tr><th scope="row">Cucurucho 2 bochas</th><td>$3.800</td></tr>
+              <tr><th scope="row">Cucurucho 3 bochas</th><td>$5.000</td></tr>
+              <tr><th scope="row">Pote ¼ kilo</th><td>$6.000</td></tr>
+              <tr><th scope="row">Pote ½ kilo</th><td>$10.000</td></tr>
+              <tr><th scope="row">Pote 1 kilo</th><td>$16.000</td></tr>
+              <tr><th scope="row">Pote 2 kilos</th><td>$30.000</td></tr>
+              <tr><th scope="row">Promo Café + Tostados</th><td>$8.000</td></tr>
+              <tr><th scope="row">Promo Café + Medialunas</th><td>$6.000</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section aria-labelledby="seo-zonas-titulo">
-        <h2 id="seo-zonas-titulo"></h2>
-        <p id="seo-zonas-texto"></p>
-        <ul id="seo-zonas-lista"></ul>
+        <h2 id="seo-zonas-titulo">Zonas de delivery</h2>
+        <div id="seo-zonas-texto">
+          <p>Hacemos delivery de helado en Don Orione, Claypole y zonas cercanas del partido de Almirante Brown, todos los días de 19:00 a 22:00 hs.</p>
+          <p>Cubrimos, entre otras, las zonas de Don Orione, Claypole, Burzaco y Longchamps (zona límite). Si no estás seguro de si llegamos a tu dirección, escribinos por WhatsApp y te confirmamos al toque antes de que cierres el pedido.</p>
+        </div>
+        <ul id="seo-zonas-lista">
+          <li>Don Orione</li>
+          <li>Claypole</li>
+          <li>Burzaco (zona límite)</li>
+          <li>Longchamps (zona límite)</li>
+          <li>Almirante Brown (radio cercano al local)</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="seo-cafeteria-titulo">
+        <h2 id="seo-cafeteria-titulo">Nuestra cafetería</h2>
+        <div id="seo-cafeteria-texto">
+          <p>Además de heladería, Sei Tu Don Orione es cafetería: café de grano, capuccino, tostados y medialunas para acompañar una salida o una merienda en el local.</p>
+          <p>Las promos de café + tostados y café + medialunas son ideales para dos, y siempre podés sumar un helado de postre. Consultanos por WhatsApp por el resto de la carta de cafetería.</p>
+        </div>
       </section>
 
       <section aria-labelledby="seo-donde-titulo">
-        <h2 id="seo-donde-titulo"></h2>
-        <p id="seo-donde-texto"></p>
-        <p><a id="link-maps" href="#" target="_blank" rel="noopener">Ver en Google Maps</a></p>
+        <h2 id="seo-donde-titulo">Dónde estamos</h2>
+        <div id="seo-donde-texto">
+          <p>Encontranos en Av. Eva Perón 2680, Don Orione, Claypole, partido de Almirante Brown, Provincia de Buenos Aires. Somos una heladería de barrio, fácil de ubicar sobre la avenida principal de Don Orione.</p>
+          <p>Abierto todos los días de 11:00 a 22:00 hs para comer en el local o retirar tu pedido. Si preferís no salir, pedí por delivery de helado en Don Orione de 19:00 a 22:00 hs — somos una de las heladerías de Almirante Brown con reparto propio en la zona.</p>
+        </div>
+        <p><a id="link-maps" href="https://maps.app.goo.gl/zoP78fGRDsccdYRg6" target="_blank" rel="noopener">Ver en Google Maps</a></p>
         <div class="mapa-wrapper">
           <iframe
             id="mapa-embed"
-            src=""
-            title=""
+            src="https://www.google.com/maps?q=-34.8817,-58.3958&z=16&output=embed"
+            title="Ubicación de Sei Tu Heladería - Cafetería en Av. Eva Perón 2680, Don Orione"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>
@@ -192,12 +353,12 @@
   </main>
 
   <footer class="site-footer">
-    <p id="footer-nombre"></p>
-    <p id="footer-direccion"></p>
-    <p id="footer-horario-local"></p>
-    <p id="footer-horario-delivery"></p>
-    <p><a id="footer-instagram" href="#" target="_blank" rel="noopener"></a></p>
-    <p><a id="footer-telefono" href="#"></a></p>
+    <p id="footer-nombre">Sei Tu Heladería - Cafetería</p>
+    <p id="footer-direccion">Av. Eva Perón 2680, Don Orione, Claypole, Almirante Brown, Buenos Aires</p>
+    <p id="footer-horario-local">Local: Lunes a domingo de 11:00 a 22:00 hs</p>
+    <p id="footer-horario-delivery">Delivery: Todos los días de 19:00 a 22:00 hs</p>
+    <p><a id="footer-instagram" href="https://www.instagram.com/seitu_donorione" target="_blank" rel="noopener">@seitu_donorione</a></p>
+    <p><a id="footer-telefono" href="tel:+5491136085617">+54 9 11 3608-5617</a></p>
   </footer>
 
   <!-- Botón flotante de WhatsApp para consultas generales (no forma parte del flujo de pedido) -->

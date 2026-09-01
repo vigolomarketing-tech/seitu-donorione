@@ -1,0 +1,10 @@
+<!--
+  Fallback para fotos de producto que todavía no se subieron a /assets/productos/.
+  Se usa desde js/app.js (onerror de la <img>) para no mostrar un ícono de imagen rota.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#29ABE2"/>
+  <path d="M100 54c-24 0-42 17-42 40 0 20 15 33 30 46l12 11 12-11c15-13 30-26 30-46 0-23-18-40-42-40z" fill="#ffffff" opacity="0.95"/>
+  <circle cx="86" cy="88" r="7" fill="#29ABE2"/>
+  <circle cx="114" cy="88" r="7" fill="#29ABE2"/>
+</svg>

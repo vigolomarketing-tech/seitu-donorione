@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!--
+    Sitio en modo demo (ver robots.txt y CONFIG.site.indexable en js/config.js):
+    mientras robots.txt tenga "Disallow: /", no tiene sentido listar acá una URL
+    para indexar. La URL del dominio final ya está cargada, pero comentada.
+
+    Antes de publicar en el dominio real: sacar el comentario de abajo (y hacer
+    los otros dos cambios de robots.txt / CONFIG.site.indexable).
+  -->
+  <!--
   <url>
     <loc>https://www.seitudonorione.com.ar/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  -->
 </urlset>

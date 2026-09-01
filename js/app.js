@@ -164,7 +164,7 @@
     cont.innerHTML = "";
 
     CONFIG.categoriasProductos.forEach((cat) => {
-      const productosCategoria = CONFIG.productos.filter((p) => p.categoria === cat.id);
+      const productosCategoria = CONFIG.productos.filter((p) => p.categoria === cat.id && p.visible !== false);
       if (productosCategoria.length === 0) return;
 
       const seccion = crearEl("div", { class: "categoria-seccion", id: `categoria-${cat.id}`, "data-categoria": cat.id });
@@ -177,6 +177,12 @@
     });
   }
 
+  function altProducto(producto) {
+    const { negocio } = CONFIG;
+    const detalle = producto.categoria === "cafeteria" ? "" : " de helado artesanal";
+    return `${producto.nombre}${detalle} - ${negocio.nombre} ${negocio.sucursal}, ${negocio.direccion.localidad}`;
+  }
+
   function renderTarjetaProducto(producto) {
     const precioTexto = producto.precio === null ? "Consultar" : formatearPrecio(producto.precio);
     const tarjeta = crearEl("article", {
@@ -187,12 +193,16 @@
       crearEl("img", {
         class: "producto-img",
         src: producto.imagen,
-        alt: `${producto.nombre} — ${CONFIG.negocio.nombre} ${CONFIG.negocio.direccion.barrio}`,
+        alt: altProducto(producto),
         loading: "lazy",
         width: "160",
         height: "160",
         onError: (e) => {
-          e.target.style.display = "none";
+          // Si todavía no se subió la foto real, mostramos el ícono de marca
+          // sobre fondo celeste en vez de dejar un hueco vacío o un ícono roto.
+          e.target.onerror = null;
+          e.target.src = CONFIG.negocio.imagenes.fallbackProducto;
+          e.target.classList.add("producto-img--fallback");
         },
       })
     );
@@ -718,7 +728,7 @@
         form.appendChild(
           crearEl("p", {
             class: "aviso-delivery",
-            text: `El delivery funciona de ${CONFIG.horarios.delivery.apertura} a ${CONFIG.horarios.delivery.cierre === "00:00" ? "00:00" : CONFIG.horarios.delivery.cierre} hs. Podés dejar el pedido igual y te confirmamos por WhatsApp.`,
+            text: `El delivery funciona de ${CONFIG.horarios.delivery.apertura} a ${CONFIG.horarios.delivery.cierre} hs. Podés dejar el pedido igual y te confirmamos por WhatsApp.`,
           })
         );
       }
@@ -860,7 +870,7 @@
       total: Cart.calcularTotal(),
       pago: { metodo: metodoPago, montoAbona },
       notas,
-      origenTexto: CONFIG.negocio.dominio.replace(/^https?:\/\/(www\.)?/, ""),
+      origenTexto: (CONFIG.site.indexable ? CONFIG.site.url : CONFIG.site.urlDemo).replace(/^https?:\/\/(www\.)?/, ""),
     };
 
     const mensaje = Whatsapp.construirMensaje(pedido);
@@ -895,38 +905,66 @@
       );
     });
 
-    const grid = $("#sabores-lista");
-    grid.innerHTML = "";
-    const saboresFiltrados = CONFIG.sabores.filter((s) => estado.filtroSabores === "todos" || s.categoria === estado.filtroSabores);
+    // Lista agrupada por categoría (mismo agrupamiento que la versión estática del
+    // HTML, para que no haya diferencia de contenido entre "sin JS" y "con JS").
+    const cont = $("#sabores-lista");
+    cont.innerHTML = "";
 
-    saboresFiltrados.forEach((sabor) => {
-      const chip = crearEl("div", {
-        class: `sabor-chip${sabor.disponible ? "" : " sabor-chip--agotado"}${sabor.destacado ? " sabor-chip--especial" : ""}`,
-      });
-      chip.appendChild(crearEl("span", { text: sabor.nombre }));
-      if (sabor.destacado) chip.appendChild(crearEl("span", { class: "badge-especial", text: "Especial" }));
-      if (!sabor.disponible) chip.appendChild(crearEl("span", { class: "badge-agotado", text: "Agotado" }));
-      grid.appendChild(chip);
+    const categoriasAMostrar = CONFIG.categoriasSabores.filter(
+      (cat) => estado.filtroSabores === "todos" || cat.id === estado.filtroSabores
+    );
+
+    categoriasAMostrar.forEach((cat) => {
+      const saboresCategoria = CONFIG.sabores.filter((s) => s.categoria === cat.id);
+      if (saboresCategoria.length === 0) return;
+
+      const grupo = crearEl("div", { class: "sabores-categoria-grupo", "data-categoria": cat.id });
+      grupo.appendChild(crearEl("h3", { class: "sabores-categoria-titulo", text: cat.nombre }));
+
+      const lista = crearEl("ul", { class: "sabores-lista-grupo" });
+      saboresCategoria.forEach((sabor) => lista.appendChild(renderItemSabor(sabor)));
+      grupo.appendChild(lista);
+
+      cont.appendChild(grupo);
     });
+  }
+
+  function renderItemSabor(sabor) {
+    const item = crearEl("li", {
+      class: `sabor-chip${sabor.disponible ? "" : " sabor-chip--agotado"}${sabor.destacado ? " sabor-chip--especial" : ""}`,
+    });
+    item.appendChild(crearEl("span", { text: sabor.nombre }));
+    if (sabor.destacado) item.appendChild(crearEl("span", { class: "badge-especial", text: "Especial" }));
+    if (!sabor.disponible) item.appendChild(crearEl("span", { class: "badge-agotado", text: "Agotado" }));
+    return item;
   }
 
   // --------------------------------------------------------------------------
   // Contenido SEO, mapa y footer
   // --------------------------------------------------------------------------
+  function renderParrafos(contenedor, parrafos) {
+    if (!contenedor) return;
+    contenedor.innerHTML = "";
+    parrafos.forEach((texto) => contenedor.appendChild(crearEl("p", { text: texto })));
+  }
+
   function renderContenidoSEO() {
     const { contenidoSEO, zonasDelivery, negocio, horarios } = CONFIG;
 
     $("#seo-como-pedir-titulo").textContent = contenidoSEO.comoPedir.titulo;
-    $("#seo-como-pedir-texto").textContent = contenidoSEO.comoPedir.texto;
+    renderParrafos($("#seo-como-pedir-texto"), contenidoSEO.comoPedir.parrafos);
 
     $("#seo-zonas-titulo").textContent = contenidoSEO.zonasDelivery.titulo;
-    $("#seo-zonas-texto").textContent = contenidoSEO.zonasDelivery.texto;
+    renderParrafos($("#seo-zonas-texto"), contenidoSEO.zonasDelivery.parrafos);
     const listaZonas = $("#seo-zonas-lista");
     listaZonas.innerHTML = "";
     zonasDelivery.forEach((zona) => listaZonas.appendChild(crearEl("li", { text: zona })));
 
+    $("#seo-cafeteria-titulo").textContent = contenidoSEO.nuestraCafeteria.titulo;
+    renderParrafos($("#seo-cafeteria-texto"), contenidoSEO.nuestraCafeteria.parrafos);
+
     $("#seo-donde-titulo").textContent = contenidoSEO.dondeEstamos.titulo;
-    $("#seo-donde-texto").textContent = contenidoSEO.dondeEstamos.texto;
+    renderParrafos($("#seo-donde-texto"), contenidoSEO.dondeEstamos.parrafos);
     $("#mapa-embed").src = negocio.googleMaps.embedSrc;
     $("#mapa-embed").title = `Ubicación de ${negocio.nombreCompleto} en ${negocio.direccion.textoCorto}`;
     $("#link-maps").href = negocio.googleMaps.urlCorta;
@@ -958,6 +996,11 @@
   // Inicialización
   // --------------------------------------------------------------------------
   function init() {
+    // Marca que JS está activo: styles.css usa esta clase para ocultar
+    // visualmente (nunca con display:none ni [hidden]) el contenido estático
+    // que queda duplicado por el catálogo interactivo, como la tabla de precios.
+    document.documentElement.classList.add("js-activo");
+
     renderBannerHorario();
     renderHero();
     renderCategoriasNav();

@@ -1,4 +1,10 @@
+# ⚠️ Sitio en modo demo (GitHub Pages). Mientras CONFIG.site.indexable sea
+# `false` en js/config.js, este archivo bloquea el rastreo por completo para
+# que Google no indexe una URL que todavía no es la definitiva.
+#
+# Antes de publicar en el dominio real: cambiar "Disallow: /" por "Allow: /"
+# acá abajo (y poner CONFIG.site.indexable en `true` en js/config.js).
 User-agent: *
-Allow: /
+Disallow: /
 
 Sitemap: https://www.seitudonorione.com.ar/sitemap.xml

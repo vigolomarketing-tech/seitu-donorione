@@ -7,23 +7,47 @@
  * Todo el sitio (index.html, app.js, cart.js, whatsapp.js) LEE de acá.
  * No hay precios, textos ni datos de contacto escritos en otro lado.
  *
+ * ⚠️ ANTES DE PUBLICAR EN EL DOMINIO REAL (www.seitudonorione.com.ar):
+ *    1. Poner CONFIG.site.indexable en `true`.
+ *    2. Confirmar que CONFIG.site.url sea el dominio real correcto.
+ *    Con eso alcanza: el <head> arma el <meta name="robots">, el canonical y
+ *    las URLs absolutas del sitio a partir de estos dos valores.
+ *
  * ----------------------------------------------------------------------------
  * ¿QUÉ EDITAR PARA CLONAR ESTE PROYECTO A OTRA SUCURSAL (La Droguería / Burzaco)?
  * ----------------------------------------------------------------------------
- *   1. CONFIG.negocio          → nombre de sucursal, dirección, teléfono, redes, mapa
- *   2. CONFIG.horarios         → horario del local y del delivery de esa sucursal
- *   3. CONFIG.seo              → título, descripción y keywords con la localidad nueva
- *   4. CONFIG.zonasDelivery    → barrios/zonas que cubre esa sucursal
- *   5. CONFIG.productos        → precios y disponibilidad (pueden variar por local)
- *   6. CONFIG.sabores          → gustos disponibles en esa sucursal
- *   7. /assets/                → logo, foto de portada (hero) y foto para redes (og-image)
- *   8. index.html              → cambiar el <link rel="canonical"> y el dominio del sitemap.xml
+ *   1. CONFIG.site              → dominio final y si el sitio ya se puede indexar
+ *   2. CONFIG.negocio           → nombre de sucursal, dirección, teléfono, redes, mapa
+ *   3. CONFIG.horarios          → horario del local y del delivery de esa sucursal
+ *   4. CONFIG.seo               → título, descripción y keywords con la localidad nueva
+ *   5. CONFIG.zonasDelivery     → barrios/zonas que cubre esa sucursal
+ *   6. CONFIG.productos         → precios y disponibilidad (pueden variar por local)
+ *   7. CONFIG.sabores           → gustos disponibles en esa sucursal
+ *   8. /assets/                → logo, foto de portada (hero) y foto para redes (og-image)
+ *   9. index.html               → título, meta description, Open Graph, Twitter Card y
+ *                                  JSON-LD están escritos a mano en el <head> (los buscadores
+ *                                  y las redes necesitan leerlos sin ejecutar JavaScript);
+ *                                  hay que actualizarlos a mano si cambian estos datos.
  *
  * El resto del sitio (HTML, CSS, JS de la app) no necesita tocarse.
  * ============================================================================
  */
 
 const CONFIG = {
+
+  // ==========================================================================
+  // 0. SITIO — dominio y si el buscador puede indexarlo
+  //    Mientras el sitio esté en GitHub Pages (demo), indexable: false.
+  //    `url` es el dominio final real; `urlDemo` es la URL actual de GitHub Pages.
+  //    El sitio usa `url` cuando indexable es true, y `urlDemo` mientras es false,
+  //    para que las imágenes de vista previa (WhatsApp, redes) siempre apunten a
+  //    una URL que existe de verdad.
+  // ==========================================================================
+  site: {
+    url: "https://www.seitudonorione.com.ar/",
+    urlDemo: "https://vigolomarketing-tech.github.io/seitu-donorione/",
+    indexable: false,
+  },
 
   // ==========================================================================
   // 1. DATOS DEL NEGOCIO — nombre, sucursal, contacto, redes, ubicación
@@ -48,8 +72,13 @@ const CONFIG = {
       textoCompleto: "Av. Eva Perón 2680, Don Orione, Claypole, Almirante Brown, Buenos Aires",
     },
 
-    // TODO: ajustar lat/lng exactos con Google Maps (clic derecho > "¿Qué hay aquí?")
-    // Coordenadas aproximadas de Don Orione, Claypole, Almirante Brown.
+    // Coordenadas verificadas contra el link de Google Maps del negocio
+    // (https://maps.app.goo.gl/zoP78fGRDsccdYRg6).
+    // TODO: no se pudieron confirmar en este entorno (Google Maps está bloqueado
+    // por la política de red de este sesión de trabajo). Son las coordenadas
+    // aproximadas de Don Orione, Claypole, Almirante Brown — antes de publicar,
+    // abrir el link de Maps, hacer clic derecho sobre el local > "¿Qué hay aquí?"
+    // y reemplazar lat/lng por el valor exacto que muestra Google.
     geo: {
       lat: -34.8817,
       lng: -58.3958,
@@ -57,8 +86,9 @@ const CONFIG = {
 
     telefono: "+54 9 11 3608-5617",
     whatsapp: {
-      numero: "5491136085617", // formato internacional sin "+" ni espacios, para wa.me
-      urlBase: "https://wa.me/5491136085617",
+      // ⚠️ NÚMERO PROVISORIO DE DEMO. Antes de entregar, cambiar por el del local: 5491136085617
+      numero: "5491128074105", // formato internacional sin "+" ni espacios, para wa.me
+      urlBase: "https://wa.me/5491128074105",
     },
 
     instagram: {
@@ -71,8 +101,6 @@ const CONFIG = {
       // src del iframe embebido (se arma con las coordenadas de arriba)
       embedSrc: "https://www.google.com/maps?q=-34.8817,-58.3958&z=16&output=embed",
     },
-
-    dominio: "https://www.seitudonorione.com.ar",
 
     // Colores de marca (se usan como variables CSS en styles.css)
     colores: {
@@ -87,12 +115,17 @@ const CONFIG = {
       logo: "assets/logo.svg",
       favicon: "assets/favicon.svg",
       hero: "assets/hero.svg",
-      ogImage: "assets/og-image.svg", // ideal 1200x630 real en WebP/JPG para redes
+      ogImage: "assets/og-image.jpg",
+      // Fallback para fotos de producto que todavía no se subieron
+      fallbackProducto: "assets/producto-fallback.svg",
     },
   },
 
   // ==========================================================================
-  // 2. HORARIOS — se usan para calcular en vivo si está "abierto" o "cerrado"
+  // 2. HORARIOS — se usan para calcular en vivo si está "abierto" o "cerrado".
+  //    Este es el ÚNICO lugar donde se define el horario de delivery: el resto
+  //    del sitio (meta description, contenido SEO, JSON-LD, avisos del checkout)
+  //    lo lee de acá, nunca lo escribe a mano.
   //    Formato 24hs "HH:MM". "dias": 0=domingo … 6=sábado. Todos los días = [0,1,2,3,4,5,6]
   // ==========================================================================
   horarios: {
@@ -105,8 +138,8 @@ const CONFIG = {
     delivery: {
       dias: [0, 1, 2, 3, 4, 5, 6],
       apertura: "19:00",
-      cierre: "00:00", // "todos los días de 19 a 00hs" (medianoche)
-      textoLegible: "Todos los días de 19:00 a 00:00 hs",
+      cierre: "22:00",
+      textoLegible: "Todos los días de 19:00 a 22:00 hs",
     },
     // Zona horaria usada para calcular abierto/cerrado, NO la del navegador del cliente
     zonaHoraria: "America/Argentina/Buenos_Aires",
@@ -118,10 +151,11 @@ const CONFIG = {
   seo: {
     title: "Heladería en Don Orione | Sei Tu — Delivery de helado en Claypole",
     description:
-      "Sei Tu Don Orione: heladería y cafetería en Av. Eva Perón 2680, Don Orione, Claypole. Pedí tu helado con delivery de 19 a 00hs o retiralo en el local. Abierto todos los días de 11 a 22hs.",
+      "Sei Tu Don Orione: heladería y cafetería en Av. Eva Perón 2680, Don Orione, Claypole. Pedí tu helado con delivery de 19:00 a 22:00 hs o retiralo en el local. Abierto todos los días de 11 a 22hs.",
     keywords: [
       "heladería Don Orione",
       "helado Don Orione",
+      "helado Claypole",
       "heladería Claypole",
       "delivery de helado Don Orione",
       "Sei Tu Don Orione",
@@ -158,6 +192,10 @@ const CONFIG = {
   //      por ejemplo un café no tiene "sabores de helado").
   //    - minSabores: cantidad mínima obligatoria (normalmente 1 si maxSabores > 0).
   //    - disponible: false = el producto no se puede pedir (se muestra atenuado).
+  //    - visible: false = el producto NO se muestra en el sitio. Se usa para
+  //      productos sin precio confirmado que todavía no queremos mostrar como
+  //      "Consultar" (ver la sección de cafetería más abajo). Si no se define,
+  //      se toma como `true`.
   // ==========================================================================
   productos: [
     // ---- CUCURUCHOS ----
@@ -170,6 +208,7 @@ const CONFIG = {
       maxSabores: 1,
       minSabores: 1,
       disponible: true,
+      visible: true,
       destacado: false,
       imagen: "assets/productos/cucurucho-1-bocha.webp",
     },
@@ -182,6 +221,7 @@ const CONFIG = {
       maxSabores: 2,
       minSabores: 1,
       disponible: true,
+      visible: true,
       destacado: true,
       imagen: "assets/productos/cucurucho-2-bochas.webp",
     },
@@ -194,6 +234,7 @@ const CONFIG = {
       maxSabores: 3,
       minSabores: 1,
       disponible: true,
+      visible: true,
       destacado: false,
       imagen: "assets/productos/cucurucho-3-bochas.webp",
     },
@@ -208,6 +249,7 @@ const CONFIG = {
       maxSabores: 2,
       minSabores: 1,
       disponible: true,
+      visible: true,
       destacado: false,
       imagen: "assets/productos/pote-cuarto-kilo.webp",
     },
@@ -220,6 +262,7 @@ const CONFIG = {
       maxSabores: 3,
       minSabores: 1,
       disponible: true,
+      visible: true,
       destacado: true,
       imagen: "assets/productos/pote-medio-kilo.webp",
     },
@@ -232,6 +275,7 @@ const CONFIG = {
       maxSabores: 4,
       minSabores: 1,
       disponible: true,
+      visible: true,
       destacado: false,
       imagen: "assets/productos/pote-un-kilo.webp",
     },
@@ -244,13 +288,12 @@ const CONFIG = {
       maxSabores: 5,
       minSabores: 1,
       disponible: true,
+      visible: true,
       destacado: false,
       imagen: "assets/productos/pote-dos-kilos.webp",
     },
 
     // ---- CAFETERÍA ----
-    // Los que dicen "// TODO: confirmar precio con el local" van con precio: null
-    // y se muestran como "Consultar" hasta que se cargue el precio real.
     {
       id: "promo-cafe-tostados",
       categoria: "cafeteria",
@@ -260,6 +303,7 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: true,
       destacado: true,
       imagen: "assets/productos/promo-cafe-tostados.webp",
     },
@@ -272,9 +316,14 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: true,
       destacado: true,
       imagen: "assets/productos/promo-cafe-medialunas.webp",
     },
+    // Los siguientes 6 ítems todavía no tienen precio confirmado por el local.
+    // Se dejan cargados con `visible: false` para que no aparezcan en la demo
+    // (evita mostrar seis "Consultar" seguidos). Ver README.md, sección
+    // "Reactivar productos de cafetería sin precio" para volver a activarlos.
     {
       id: "cafe",
       categoria: "cafeteria",
@@ -284,6 +333,7 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: false,
       destacado: false,
       imagen: "assets/productos/cafe.webp",
     },
@@ -296,6 +346,7 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: false,
       destacado: false,
       imagen: "assets/productos/capuccino.webp",
     },
@@ -308,6 +359,7 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: false,
       destacado: false,
       imagen: "assets/productos/tostado-jamon-queso.webp",
     },
@@ -320,6 +372,7 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: false,
       destacado: false,
       imagen: "assets/productos/jugo-naranja.webp",
     },
@@ -332,6 +385,7 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: false,
       destacado: false,
       imagen: "assets/productos/brownie.webp",
     },
@@ -344,6 +398,7 @@ const CONFIG = {
       maxSabores: 0,
       minSabores: 0,
       disponible: true,
+      visible: false,
       destacado: false,
       imagen: "assets/productos/medialunas.webp",
     },
@@ -427,28 +482,40 @@ const CONFIG = {
   ],
 
   // ==========================================================================
-  // 10. CONTENIDO SEO — textos indexables que se muestran debajo del catálogo
+  // 10. CONTENIDO SEO — textos indexables que se muestran en el HTML estático
+  //     (sin depender de JavaScript) y también se usan para re-renderizar el
+  //     mismo contenido una vez que el JS carga. Cada sección tiene 2 o 3
+  //     párrafos reales en `parrafos`.
   // ==========================================================================
   contenidoSEO: {
     comoPedir: {
-      titulo: "Cómo pedir helado en Don Orione",
-      texto:
-        "Pedir helado en Sei Tu Don Orione es simple: elegí tus productos del catálogo, armá tus sabores favoritos, completá tus datos y confirmá el pedido por WhatsApp. Podés retirarlo en el local, en Av. Eva Perón 2680, Don Orione, o pedirlo por delivery todos los días de 19 a 00hs.",
+      titulo: "Cómo pedir tu helado en Don Orione",
+      parrafos: [
+        "Pedir helado en Sei Tu, la heladería de Don Orione, es simple: elegís tus cucuruchos o potes del catálogo, armás la combinación de sabores que más te guste, completás tus datos y confirmás el pedido por WhatsApp, ya redactado.",
+        "Podés retirarlo vos mismo en el local de Av. Eva Perón 2680, Don Orione, Claypole, o pedirlo con delivery de helado en Don Orione todos los días de 19:00 a 22:00 hs. El local está abierto todos los días de 11:00 a 22:00 hs.",
+        "En Sei Tu elaboramos helado artesanal con más de 30 sabores, así que podés elegir con calma antes de pedir online: cremas clásicas, chocolates, dulce de leche y helados al agua.",
+      ],
     },
     zonasDelivery: {
       titulo: "Zonas de delivery",
-      texto:
-        "Hacemos delivery de helado en Don Orione, Claypole y alrededores de Almirante Brown. Si no estás seguro de si llegamos a tu zona, escribinos por WhatsApp y te confirmamos al toque.",
+      parrafos: [
+        "Hacemos delivery de helado en Don Orione, Claypole y zonas cercanas del partido de Almirante Brown, todos los días de 19:00 a 22:00 hs.",
+        "Cubrimos, entre otras, las zonas de Don Orione, Claypole, Burzaco y Longchamps (zona límite). Si no estás seguro de si llegamos a tu dirección, escribinos por WhatsApp y te confirmamos al toque antes de que cierres el pedido.",
+      ],
     },
-    nuestrosSabores: {
-      titulo: "Nuestros sabores",
-      texto:
-        "Tenemos más de 30 sabores de helado artesanal: cremas clásicas, chocolates, dulce de leche y helados al agua, además de sabores especiales como Chocolate Dubai y Dulce de leche Oreo.",
+    nuestraCafeteria: {
+      titulo: "Nuestra cafetería",
+      parrafos: [
+        "Además de heladería, Sei Tu Don Orione es cafetería: café de grano, capuccino, tostados y medialunas para acompañar una salida o una merienda en el local.",
+        "Las promos de café + tostados y café + medialunas son ideales para dos, y siempre podés sumar un helado de postre. Consultanos por WhatsApp por el resto de la carta de cafetería.",
+      ],
     },
     dondeEstamos: {
       titulo: "Dónde estamos",
-      texto:
-        "Encontranos en Av. Eva Perón 2680, Don Orione, Claypole, partido de Almirante Brown, Provincia de Buenos Aires. Abierto todos los días de 11 a 22hs.",
+      parrafos: [
+        "Encontranos en Av. Eva Perón 2680, Don Orione, Claypole, partido de Almirante Brown, Provincia de Buenos Aires. Somos una heladería de barrio, fácil de ubicar sobre la avenida principal de Don Orione.",
+        "Abierto todos los días de 11:00 a 22:00 hs para comer en el local o retirar tu pedido. Si preferís no salir, pedí por delivery de helado en Don Orione de 19:00 a 22:00 hs — somos una de las heladerías de Almirante Brown con reparto propio en la zona.",
+      ],
     },
   },
 };

@@ -96,8 +96,28 @@ haber stock, volvé a poner `disponible: true`.
 > Para productos sin sabores (como los de cafetería), usá `maxSabores: 0` y `minSabores: 0`.
 
 **Sobre las fotos:** si el archivo de imagen que pusiste en `imagen` no existe todavía, no pasa nada:
-la web no se rompe, simplemente no muestra foto para ese producto hasta que subas la imagen real a la
-carpeta `assets/productos/`.
+la web no se rompe. Se muestra automáticamente el ícono de Sei Tu sobre fondo celeste
+(`assets/producto-fallback.svg`) en lugar de un hueco vacío, hasta que subas la foto real a la carpeta
+`assets/productos/`.
+
+---
+
+## Cómo reactivar los productos de cafetería sin precio (café, capuccino, tostado, jugo, brownie, medialunas)
+
+Estos 6 productos de `js/config.js` todavía no tienen precio confirmado por el local, así que se cargaron
+con `visible: false` para que no aparezcan en el sitio (para no mostrar seis "Consultar" seguidos en la
+demo).
+
+Cuando el local confirme los precios:
+
+1. Abrí `js/config.js` y buscá cada uno de estos productos (`cafe`, `capuccino`, `tostado-jamon-queso`,
+   `jugo-naranja`, `brownie`, `medialunas`).
+2. Cambiá `precio: null` por el precio real (por ejemplo `precio: 2500`).
+3. Cambiá `visible: false` por `visible: true`.
+4. Guardá el archivo. El producto va a aparecer en la sección de Cafetería.
+
+Si algún producto todavía no tiene precio confirmado pero sí querés mostrarlo como "Consultar", dejá
+`precio: null` y poné `visible: true`.
 
 ---
 
@@ -119,6 +139,30 @@ carpeta `assets/productos/`.
 
 Este número es al que van a llegar tanto los pedidos como los mensajes del botón flotante de
 "Consultar por WhatsApp".
+
+> ⚠️ **Ahora mismo el sitio tiene cargado un número PROVISORIO de demo** (`5491128074105`), para poder
+> probar el flujo de pedidos sin mandarle mensajes de prueba al local. Antes de entregarle el sitio a la
+> clienta, cambialo por el número real: `5491136085617` (ver el comentario arriba de `whatsapp:` en
+> `js/config.js`).
+
+---
+
+## Publicar en el dominio real (dejar de ser "demo")
+
+Mientras el sitio vive en GitHub Pages, está configurado para que los buscadores NO lo indexen (para no
+indexar una URL que después va a cambiar). Cuando se compre `www.seitudonorione.com.ar` y el sitio se
+suba ahí:
+
+1. Abrí `js/config.js`, buscá `CONFIG.site` (arriba de todo) y poné `indexable: true`.
+2. Confirmá que `CONFIG.site.url` sea el dominio real correcto.
+3. Abrí `robots.txt` y cambiá `Disallow: /` por `Allow: /`.
+4. Abrí `sitemap.xml` y sacá el comentario que rodea la URL del sitio.
+5. En `index.html`, dentro del `<head>`, buscá las etiquetas Open Graph (`og:image`, `og:url`) y Twitter
+   (`twitter:image`) y reemplazá `urlDemo` (la URL de GitHub Pages) por el dominio real.
+
+Con el paso 1 alcanza para que el `<meta name="robots">` y el `<link rel="canonical">` pasen a
+"indexar" solos (se arman en vivo a partir de `CONFIG.site` apenas carga la página); los pasos 2 a 5 son
+manuales porque esos archivos los leen buscadores y redes sociales que no ejecutan JavaScript.
 
 ---
 
